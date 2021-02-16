@@ -6,3 +6,6 @@
 
 ## Exercise 2: Responsive Audi R8 Display Website (HTML & CSS)
 ![alt text](https://user-images.githubusercontent.com/50206147/106082002-e9bb2500-60e7-11eb-922d-1f23afc0b566.png)
+
+## Exercise 3: JavaScript Score Keeper (JavaScript, Bulma (CSS Framework))
+![alt text](https://user-images.githubusercontent.com/50206147/108020200-dc5bd100-6fe9-11eb-906f-d5971635a43b.png)
