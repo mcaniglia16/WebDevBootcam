@@ -11,7 +11,7 @@ app.use(methodOverride("_method"))
 app.set('views', path.join(__dirname, "views"))
 app.set("view engine", 'ejs');
 
-const comments = [
+let comments = [
     {
         username: "Todd",
         comment: "lol that is so funny!",
@@ -82,6 +82,16 @@ app.get('/comments/:id/edit', (req, res) => {
     const { id } = req.params;
     const comment = comments.find(c => c.id === id);
     res.render('comments/edit', {comment});
+})
+
+//DELETE route
+app.delete("/comments/:id", (req, res) => {
+    const { id } = req.params;
+    // const comment = comments.find(c => c.id === id);
+
+    //filter is better because of IMMUTABILITY (filter does not modify comments array, it creates a new one)
+    comments = comments.filter(c => c.id !== id)
+    res.redirect("/comments");
 })
 
 app.get('/tacos', (req, res) => {
