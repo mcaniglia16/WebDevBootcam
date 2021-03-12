@@ -1,1 +1,0 @@
-Full Stack Project to complete the Bootcamp 
