@@ -25,41 +25,46 @@ app.use(methodOverride('_method'));
 *////////////////////////////////////////////
 app.get('/farms', async (req, res) => {
     const farms = await Farm.find({});
-    res.render('farms/farms', {farms});
+    res.render('farms/farms', { farms })
 })
-
-app.get('/farms/new', (req, res)=> {
-    res.render('farms/new');
+app.get('/farms/new', (req, res) => {
+    res.render('farms/new')
 })
-
 app.get('/farms/:id', async (req, res) => {
-    const farm = await Farm.findById(req.params.id);
-    res.render('farms/show', {farm})
+    const farm = await Farm.findById(req.params.id).populate('products');
+    // console.log(farm);
+    res.render('farms/show', { farm })
 })
 
-app.post('/farms', async (req,res) => {
-    const newFarm = new Farm(req.body);
-    await newFarm.save();
-    const farms = await Farm.find({});
-    res.render('farms/farms', {farms});
+app.delete('/farms/:id', async (req, res) => {
+    const farm = await Farm.findByIdAndDelete(req.params.id);
+
+    res.redirect('/farms');
+})
+
+app.post('/farms', async (req, res) => {
+    const farm = new Farm(req.body);
+    await farm.save();
+    res.redirect('/farms')
 })
 
 app.get('/farms/:id/products/new', async (req, res) => {
     const { id } = req.params;
     const farm = await Farm.findById(id);
-    res.render('products/new', {categories, farm});
+    res.render('products/new', { categories, farm })
 })
 
 app.post('/farms/:id/products', async (req, res) => {
-    const {name, price, category} = req.body;
-    const newProduct = new Product({name, price, category});
-    const {id} = req.params;
+    const { id } = req.params;
     const farm = await Farm.findById(id);
-    farm.products.push(newProduct);
-    newProduct.farm = farm;
+    const { name, price, category } = req.body;
+    const product = new Product({ name, price, category });
+    farm.products.push(product);
+    product.farm = farm;
     await farm.save();
-    await newProduct.save();
-    res.redirect(`farms/${farm._id}`);
+    await product.save();
+    console.log(farm);
+    res.redirect(`/farms/${id}`)
 })
 
 /*///////////////////////////////////////////
@@ -93,7 +98,7 @@ app.post('/products', async(req, res) => {
 
 app.get('/products/:id', async(req, res) => {
     const { id } = req.params;
-    const product = await Product.findById(id);
+    const product = await Product.findById(id).populate('farm');
     console.log(product);
     // res.send('Details page!');
     res.render('products/details', { product, id });
