@@ -24,6 +24,13 @@ app.set('views', 'views');
 app.use(express.urlencoded({extended: true}));
 app.use(sesion({secret: 'notagoodsecret'}));
 
+const requireLogin = (req, res, next) => {
+    if(!req.session.user_id) {
+        return res.redirect('/login');
+    }
+    next();
+}
+
 app.get('/', (req, res) => {
     res.send("This is the home page");
 })
@@ -32,13 +39,21 @@ app.get('/register', (req, res) => {
     res.render('register')
 })
 
+// app.post('/register', async (req, res) => {
+//     const {username, password} = req.body;
+//     const hash = await bcrypt.hash(password, 12)
+//     const user = new User({
+//         username: username,
+//         password: hash
+//     });
+//     await user.save();
+//     req.session.user_id = user._id;
+//     res.redirect('/');
+// })
+
 app.post('/register', async (req, res) => {
     const {username, password} = req.body;
-    const hash = await bcrypt.hash(password, 12)
-    const user = new User({
-        username: username,
-        password: hash
-    });
+    const user = new User({username, password});
     await user.save();
     req.session.user_id = user._id;
     res.redirect('/');
@@ -50,9 +65,8 @@ app.get('/login', (req,res) => {
 
 app.post('/login', async (req,res) => {
     const {username, password} = req.body;
-    const user = await User.findOne({username: username});
-    const valid = await bcrypt.compare(password, user.password);
-    if(!user || !valid) {
+    const user = await User.findAndValidate(username, password);
+    if(!user) {
         res.redirect("/login")
     } else {
         req.session.user_id = user._id;
@@ -66,11 +80,12 @@ app.post('/logout', (req, res) => {
     res.redirect('/login');
 })
 
-app.get('/secret', (req, res) => {
-    if(!req.session.user_id){
-        return res.redirect('/login');
-    }
-    res.render('secret')
+app.get('/secret', requireLogin, (req, res) => {
+    res.render('secret');
+})
+
+app.get('/topsecret', requireLogin, (req, res) => {
+    res.send('TOP secret');
 })
 
 app.listen(3000, () => {
