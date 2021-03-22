@@ -6,6 +6,9 @@ const session = require('express-session');
 const flash = require('connect-flash');
 const methodOverride = require('method-override');
 const ExpressError = require('./utils/ExpressError');
+const passport = require("passport");
+const localStrategy = require("passport-local");
+const User = require("./models/user");
 
 mongoose.connect('mongodb://localhost:27017/yelp-camp', {
     useNewUrlParser: true,
@@ -41,18 +44,36 @@ const sessionConfig = {
 }
 app.use(session(sessionConfig));
 app.use(flash());
-/////////////////////FLASH MIDDLEWARE
+
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new localStrategy(User.authenticate()))
+
+passport.serializeUser(User.serializeUser()); //tells passport how to store a user in the session
+passport.deserializeUser(User.deserializeUser()); //tells passport how to get user out of the session
+
+
+///////////////////// FLASH MIDDLEWARE
 app.use((req, res, next) => {
     res.locals.success = req.flash("success");
     res.locals.error = req.flash("error");
     next();
 })
 
-//ROUTES
-const campgrounds = require('./routes/campgrounds');
-const reviews = require('./routes/reviews');
-app.use('/campgrounds', campgrounds);           //prefix all routes in campgrounds.js with /campgrounds
-app.use('/campgrounds/:id/reviews', reviews);   //prefix all routes in reviews.js with /reviews
+///////////////////// ROUTES
+const campgroundRoutes = require('./routes/campgrounds');
+const reviewRoutes = require('./routes/reviews');
+const authRoutes = require('./routes/auth');
+
+app.use('/campgrounds', campgroundRoutes);           //prefix all routes in campgrounds.js with /campgrounds
+app.use('/campgrounds/:id/reviews', reviewRoutes);   //prefix all routes in reviews.js with /reviews
+app.use('/', authRoutes);
+
+app.get('/fakeUser', async (req, res) => {
+    const user = new User({email: 'marco@gmail.com', username: 'mcanig'});
+    const newUser = await User.register(user, 'charlie');
+    res.send(newUser)
+})
 
 app.get('/', (req, res) => {
     res.render('home');
