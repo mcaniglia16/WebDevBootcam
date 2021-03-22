@@ -57,6 +57,7 @@ passport.deserializeUser(User.deserializeUser()); //tells passport how to get us
 app.use((req, res, next) => {
     res.locals.success = req.flash("success");
     res.locals.error = req.flash("error");
+    res.locals.signedInUser = req.user;
     next();
 })
 
