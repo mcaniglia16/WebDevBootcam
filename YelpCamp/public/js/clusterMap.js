@@ -1,6 +1,6 @@
 mapboxgl.accessToken = mapToken;
 const map = new mapboxgl.Map({
-    container: 'map',
+    container: 'cluster-map',
     style: 'mapbox://styles/mapbox/light-v10',
     center: [-103.59179687498357, 40.66995747013945],
     zoom: 3
@@ -80,6 +80,8 @@ map.on('load', function () {
         }
     });
 
+    map.addControl(new mapboxgl.NavigationControl());
+
     // inspect a cluster on click
     map.on('click', 'clusters', function (e) {
         const features = map.queryRenderedFeatures(e.point, {
@@ -104,7 +106,7 @@ map.on('load', function () {
     // the location of the feature, with
     // description HTML from its properties.
     map.on('click', 'unclustered-point', function (e) {
-        const { popUpMarkup } = e.features[0].properties;
+        const { popupText } = e.features[0].properties;
         const coordinates = e.features[0].geometry.coordinates.slice();
 
         // Ensure that if the map is zoomed out such that
@@ -116,7 +118,7 @@ map.on('load', function () {
 
         new mapboxgl.Popup()
             .setLngLat(coordinates)
-            .setHTML(popUpMarkup)
+            .setHTML(popupText)
             .addTo(map);
     });
 
