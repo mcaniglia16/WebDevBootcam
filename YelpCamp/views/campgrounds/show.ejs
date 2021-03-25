@@ -6,9 +6,10 @@
 
             <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
                 <div class="carousel-indicators">
-                    <% for(i=0; i<campground.images.length; i++) { %> 
-                    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="<%=i%>" class="active" aria-current="true" aria-label="Slide <%=i%>"></button>
-                    <% } %> 
+                    <% for(i=0; i<campground.images.length; i++) { %>
+                        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="<%=i%>"
+                            class="active" aria-current="true" aria-label="Slide <%=i%>"></button>
+                        <% } %>
                 </div>
                 <div class="carousel-inner">
                     <!-- < for(let img of campground.images) { %> -->
@@ -33,9 +34,6 @@
             </div>
 
             <div class="card mb-3">
-                <!-- < for(let img of campground.images) { %> 
-                <img src="<=img.url%>" class="card-img-top" alt="...">
-                < } %>  -->
                 <div class="card-body">
                     <h5 class="card-title">
                         <%= campground.title %>
@@ -66,6 +64,7 @@
             </div>
         </div>
         <div class="col-6">
+            <div id='map' style='width: 100%; height: 300px;'></div>
             <div class="col-12">
                 <% if(signedInUser) { %>
                     <h2>Leave a Review</h2>
@@ -128,3 +127,9 @@
             </div>
         </div>
     </div>
+
+    <script>
+        const mapToken = '<%-process.env.MAPBOX_TOKEN%>';
+        const campground = <%-JSON.stringify(campground)%>;
+    </script>
+    <script src="/js/showMap.js"></script>
